@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
 
     PlayerRotation playerRotation;
 
-    PlayerInteracter playerInteracter;
+    PlayerTurnInteracter playerTurnInteracter;
 
     CameraShake cameraShake;
 
@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
 
         playerRotation = GetComponent<PlayerRotation>();
 
-        playerInteracter = GetComponent<PlayerInteracter>();
+        playerTurnInteracter = GetComponent<PlayerTurnInteracter>();
 
         cameraShake = GetComponentInChildren<CameraShake>();
     }
@@ -57,72 +57,78 @@ public class PlayerController : MonoBehaviour
     {
         if (backing)
         {
-            if(playerRotation.Back())
-            {
-                transform.rotation = Quaternion.Euler(0, Mathf.Round(transform.rotation.eulerAngles.y / 90) * 90, 0);
-                backing = false;
-                animationing = false;
-                backTime = backDelayTime;
-            }
+            Backing();
         }
 
         if (turning)
         {
-            bool isx = false;
-            if(transform.forward.x > 0)
-            {
-                isx = true;
-            }
-
-            float XorZ=-1;
-            if (turnDirection)//right
-            {
-                if (isx)
-                {
-                    XorZ = playerInteracter.rightPosition.x;
-                }
-                else
-                {
-                    XorZ = playerInteracter.rightPosition.z;
-                }
-            }
-            else//left
-            {
-                if (isx)
-                {
-                    XorZ = playerInteracter.leftPosition.x;
-                }
-                else
-                {
-                    XorZ = playerInteracter.leftPosition.z;
-                }
-            }
-
-            cameraShake.Shake();
-            if (playerMovement.TargetWalk(XorZ, Speed, isx) < turnRange)
-            {
-                if (playerRotation.Turn())
-                {
-                    transform.rotation = Quaternion.Euler(0, Mathf.Round(transform.rotation.eulerAngles.y / 90) * 90, 0);
-                    turning = false;
-                    animationing = false;
-                    turnTime = turnDelayTime;
-                    cameraShake.StopShake();
-                }
-            }
+            Turning();
         }
-
-        DelayTimer();
 
         if (animationing) return;
 
+        DelayTimer();
+
         if (isWalking)
         {
-            playerInteracter.CheckWay();
+            playerTurnInteracter.CheckWay();
         }
 
         InputControl();
 
+    }
+
+    void Backing()
+    {
+        if (playerRotation.Back())
+        {
+            transform.rotation = Quaternion.Euler(0, Mathf.Round(transform.rotation.eulerAngles.y / 90) * 90, 0);
+            backing = false;
+            animationing = false;
+            backTime = backDelayTime;
+        }
+    }
+
+    bool isx;
+
+    void Turning()
+    {
+        float XorZ = -1;
+        if (turnDirection)//right
+        {
+            if (isx)
+            {
+                XorZ = playerTurnInteracter.rightPosition.x;
+            }
+            else
+            {
+                XorZ = playerTurnInteracter.rightPosition.z;
+            }
+        }
+        else//left
+        {
+            if (isx)
+            {
+                XorZ = playerTurnInteracter.leftPosition.x;
+            }
+            else
+            {
+                XorZ = playerTurnInteracter.leftPosition.z;
+            }
+        }
+
+        cameraShake.Shake();
+        if (playerMovement.TargetWalk(XorZ, Speed, isx) < turnRange)
+        {
+            if (playerRotation.Turn())
+            {
+                transform.rotation = Quaternion.Euler(0, Mathf.Round(transform.rotation.eulerAngles.y / 90) * 90, 0);
+                turning = false;
+                animationing = false;
+                turnTime = turnDelayTime;
+                cameraShake.StopShake();
+            }
+        }
     }
 
     void DelayTimer()
@@ -130,6 +136,11 @@ public class PlayerController : MonoBehaviour
         if (turnTime > 0)
         {
             turnTime -= Time.deltaTime;
+        }
+
+        if(backTime > 0)
+        {
+            backTime -= Time.deltaTime;
         }
     }
 
@@ -140,18 +151,18 @@ public class PlayerController : MonoBehaviour
             playerRotation.HeadRotate(inputData.rotationValue);
         }
 
-        if(inputData.GetInteraction())
-        {
-            playerInteracter.Interact();
-        }
-
         if (!isWalking) return;
 
         if (inputData.isWalking)
         {
             if (playerMovement.Walk(Speed))
             {
+                Debug.Log(MapManager.Instance.GetPlayerCell().Tile.coordinate);
                 cameraShake.Shake();
+            }
+            else
+            {
+                cameraShake.StopShake();
             }
         }
         else
@@ -168,24 +179,32 @@ public class PlayerController : MonoBehaviour
             cameraShake.StopShake();
         }
 
-        if (playerInteracter.canTurnLeft && inputData.moveValue < 0 && turnTime <= 0)
+        if (playerTurnInteracter.canTurnLeft && inputData.moveValue < 0 && turnTime <= 0)
         {
-            turnDirection = false;
-            playerRotation.ReSetTurn(false);
-            turning = true;
-            turnDirection = false;
-            animationing = true;
-            cameraShake.StopShake();
+            LeftRightTurn(false);
         }
 
-        if (playerInteracter.canTurnRight && inputData.moveValue > 0 && turnTime <= 0)
+        if (playerTurnInteracter.canTurnRight && inputData.moveValue > 0 && turnTime <= 0)
         {
-            turnDirection = true;
-            playerRotation.ReSetTurn(true);
-            turning = true;
-            turnDirection = true;
-            animationing = true;
-            cameraShake.StopShake();
+            LeftRightTurn(true);
         }
+    }
+
+    void LeftRightTurn(bool direction)
+    {
+        turnDirection = direction;
+        playerRotation.ReSetTurn(direction);
+
+        turning = true;
+        animationing = true;
+        if (Mathf.Abs(transform.forward.x) > 0.5f)
+        {
+            isx = true;
+        }
+        else
+        {
+            isx = false;
+        }
+        cameraShake.StopShake();
     }
 }

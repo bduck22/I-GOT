@@ -34,15 +34,6 @@
                     "initialStateCheck": false
                 },
                 {
-                    "name": "Interaction",
-                    "type": "Button",
-                    "id": "c561ee63-cf11-4c62-b0aa-95dcf6c3fdb8",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": false
-                },
-                {
                     "name": "Move",
                     "type": "Value",
                     "id": "e740b2e4-9521-4197-be41-890c22c1c3ef",
@@ -105,17 +96,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Back",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "507d4bd6-0fc6-426a-8d77-abc776a275fc",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Interaction",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

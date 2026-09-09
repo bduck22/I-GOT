@@ -8,7 +8,6 @@ public class InputData
     public float rotationValue;
     public bool isWalking;
     bool isBack;
-    bool isInteraction;
     public float moveValue;
 
     public bool GetBack()
@@ -21,18 +20,6 @@ public class InputData
     public void SetBack()
     {
         isBack = true;
-    }
-
-    public bool GetInteraction()
-    {
-        bool interaction = isInteraction;
-        isInteraction = false;
-        return interaction;
-    }
-
-    public void SetInteraction()
-    {
-        isInteraction = true;
     }
 }
 
@@ -58,10 +45,8 @@ public class InputHandler : MonoBehaviour
 
         InputActions.Player.Walk.started += OnWalk;
         InputActions.Player.Back.started += OnBack;
-        InputActions.Player.Interaction.started += OnInteraction;
 
         InputActions.Player.Walk.canceled += OnWalk;
-        InputActions.Player.Interaction.canceled += OnInteraction;
 
         InputActions.Player.Move.started += OnMove;
         InputActions.Player.Move.canceled += OnMove;
@@ -74,10 +59,8 @@ public class InputHandler : MonoBehaviour
 
         InputActions.Player.Walk.started -= OnWalk;
         InputActions.Player.Back.started -= OnBack;
-        InputActions.Player.Interaction.started -= OnInteraction;
 
         InputActions.Player.Walk.canceled -= OnWalk;
-        InputActions.Player.Interaction.canceled -= OnInteraction;
 
         InputActions.Player.Move.started -= OnMove;
         InputActions.Player.Move.canceled -= OnMove;
@@ -96,11 +79,6 @@ public class InputHandler : MonoBehaviour
     public void OnBack(InputAction.CallbackContext ctx)
     {
         inputData.SetBack();
-    }
-
-    public void OnInteraction(InputAction.CallbackContext ctx)
-    {
-        inputData.SetInteraction();
     }
 
     public void OnMove(InputAction.CallbackContext ctx)

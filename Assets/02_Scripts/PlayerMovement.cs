@@ -4,6 +4,12 @@ public class PlayerMovement : MonoBehaviour
 {
     public Transform Player;
 
+    [SerializeField] private LayerMask WallLayer;
+
+    //private readonly Vector3 pivot = new Vector3(0,1,0);
+
+    public float checkWallDistance;
+
     private void Start()
     {
         if (Player == null)
@@ -14,6 +20,11 @@ public class PlayerMovement : MonoBehaviour
 
     public bool Walk(float Speed)
     {
+        if(Physics.Raycast(transform.position, transform.forward, checkWallDistance, WallLayer))
+        {
+            return false;
+        }
+
         Player.position = Vector3.MoveTowards(Player.transform.position, Player.transform.position + Player.transform.forward, Speed * Time.deltaTime);
 
         return true;
